@@ -147,7 +147,14 @@ public class PropertyValueBuffer
         }
         // Third: default value
         JsonDeserializer<Object> deser = prop.getValueDeserializer();
-        return deser.getNullValue(_context);
+        Object value = deser.getNullValue(_context);
+
+        if (_context.isEnabled(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES) && value == null) {
+            throw _context.mappingException("Null value for creator property '%s'; DeserializationFeature.FAIL_ON_NULL_FOR_CREATOR_PARAMETERS enabled",
+                    prop.getName(), prop.getCreatorIndex());
+        }
+
+        return value;
     }
 
     /*
